@@ -41,3 +41,114 @@ SELECT * FROM EMPLOYEES;
 
 INSERT INTO EMPLOYEES (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, MANAGER_ID, department_id)
     VALUES (EMPLOYEES_SEQ.NEXTVAL, 'SEUNGJUN','HA', 'QWER1234@QWER.QWER', '01012341234',SYSDATE, 'AD_ASST', 4400, 101, 10);
+
+-- start with, connet by, having
+
+select first_name, last_name from employees where employee_id = 207;
+
+-- concat 연산자 || 하나 이상의 컬럼을 합쳐서 표현 / as 공백 사용시 ""
+select first_name || last_name full_name from employees where employee_id = 207;
+
+select first_name || last_name 서명, salary 월급, department_id 부서번호 from employees where salary < 10000 and department_id = 30;
+
+select hire_date from employees where hire_date > '1996-01-01';
+
+select first_name || last_name 서명, salary 월급, department_id 부서번호 from employees
+where (department_id = 10 and salary < 10000) or  (department_id = 60 and salary > 5000);
+
+-- 컬럼 between value1 and value2 : 값 사이 조회
+
+select employee_id 사번, first_name || last_name 서명, salary 월급, department_id 부서번호 from employees
+where not(employee_id BETWEEN 110 and 120);
+
+select * from employees
+where department_id in (30,60,90);
+
+-- exists : 서브쿼리만을 이용해서 결과를 조건에 매핑하는 연산자
+select employee_id 사번, first_name || last_name 서명, salary 월급, department_id 부서번호 from employees emp where exists
+(select department_id from departments dept where department_id in (30,60,90) and emp.department_id = dept.department_id);
+
+-- like 연산자 : 특정 패턴을 준비해서 해당 패턴에 데이터가 존재하는지를  검증해서 결과를 도출하도록 하는 연산자
+-- ex > where full_name like '%동' --동으로 끝나는 문자열이 존재하는지 검증, '%동%' > 동이 들어가있는 문자열을 검증 
+
+select * from employees emp 
+where phone_number not like '%42%';
+
+select email from employees where email like '%S_I%';
+
+select * from departments;
+
+select * from locations where state_province is null;
+
+select * from jobs;
+SELECT * from employees;
+SELECT * from departments;
+SELECT * FROM locations;
+
+select first_name, last_name, dept.department_id, dept.department_name from employees emp, departments dept, jobs jobs 
+where emp.department_id = dept.department_id and emp.job_id = jobs.job_id;
+
+select first_name, last_name, dept.department_id, dept.department_name, location.city from employees emp, departments dept, locations location
+where emp.department_id = dept.department_id and dept.location_id = location.location_id and location.state_province = 'California';
+
+select * from employees;
+
+select emp.employee_id, emp.first_name || emp.last_name 사원이름, emp.manager_id, emp2.first_name || emp2.last_name 매니저이름 from employees emp, employees emp2
+where emp.manager_id = emp2.employee_id;
+
+
+select emp.* from employees emp, departments dept, locations location
+where emp.department_id = dept.department_id and dept.location_id = location.location_id and location.city != 'Bombay';
+
+
+select emp.employee_id, first_name || last_name 이름, dept.department_id 부서코드, dept.department_name 부서명, location.city from employees emp, departments dept,locations location
+where emp.department_id = dept.department_id(+) and dept.location_id = location.location_id(+) order by emp.employee_id asc;
+
+-- select -- count(*) from -- GROUP BY employee_id HAVING count(*) > 1;
+
+select emp.* from employees emp, job_history jh, count(*) GROUP BY emp.employee_id;
+
+select emp.* from employees emp, job_history jb where emp.employee_id = jb.employee_id(+);
+
+--Ansi Join : 국제표준 조인 방식 
+--inner join : 공통되는 컬럼을 기준으로 조인
+--문법2가지
+Select *
+    from employees emp, departments dept 
+where emp.department_id = dept.department_id;
+
+Select *
+    from employees emp inner join departments dept
+on emp.department_id = dept.department_id;
+
+select * from employees emp inner join departments dept using (department_id);
+
+select * from  employees emp, job_history job where emp.employee_id = job.employee_id(+) order by job.employee_id;
+
+select job.employee_id, emp.first_name from employees emp left outer join job_history job on emp.employee_id = job.employee_id order by job.employee_id;
+
+-- function
+select concat('a','b') from dual;
+select initcap('abcde') from dual;
+select lower('AAAA') from dual;
+select lpad('abc',7) from dual;
+select lpad('abc',7,'#') from dual;
+
+select * from jobs;
+SELECT * from employees;
+SELECT * from departments;
+SELECT * FROM locations;
+
+
+--nvl(컬럼, 대체값)
+SELECT salary, employee_id, first_name, salary * nvl(commission_pct,0) from employees where salary * nvl(commission_pct,0) < 1000;
+
+--nvl2(표현식1, 2, 3) : 표현식이 널이면 표현식 3을 아니면 2를 반환 
+select employee_id, first_name, salary, salary + salary * commission_pct total_salary, nvl2(commission_pct, salary+(salary*commission_pct),salary)total_salary2 from employees;
+
+
+
+
+
+
+
