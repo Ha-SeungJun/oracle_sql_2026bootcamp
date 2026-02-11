@@ -228,3 +228,22 @@ update characters set master_id = (select character_id FROM characters where cha
 update characters set master_id = (select character_id FROM characters where character_name = '듀크 백작') where character_name = '콰이곤 진 ';
 
 COMMIT;
+
+select * from CHARACTERS where character_name like '%다스%' or character_name like '%다쓰%';
+
+-- 다중 like
+select * from CHARACTERS where REGEXP_LIKE(character_name,'다스|다쓰');
+
+
+SELECT * from casting;
+select * from CHARACTERS;
+select * from star_wars;
+
+select cha.character_name, rol.role_name, cha.email 
+    from characters cha inner join roles rol
+on cha.role_id = rol.role_id;
+
+
+select cha.character_name, rol.role_name, cha.email from characters cha left outer join roles rol on cha.role_id = rol.role_id;
+
+
