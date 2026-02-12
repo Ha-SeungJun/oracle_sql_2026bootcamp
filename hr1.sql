@@ -139,6 +139,21 @@ SELECT * from employees;
 SELECT * from departments;
 SELECT * FROM locations;
 
+create table caseex(
+    C_ID varchar2(20),
+    C_NAME VARCHAR2(20),
+    GENDER VARCHAR2(20)
+)
+
+insert into caseex values ('b','bbb','f');
+insert into caseex values ('c','ccc','f');
+insert into caseex values ('d','ddd','m');
+insert into caseex values ('e','eee','f');
+insert into caseex values ('f','Fff','m');
+
+select * from caseex;
+
+select c_id, c_name, decode(gender, 'm', '남성','f','여성','중성') decode, case gender when 'm' then '남성' when 'f' then '여성' else '중성' end case from caseex;
 
 --nvl(컬럼, 대체값)
 SELECT salary, employee_id, first_name, salary * nvl(commission_pct,0) from employees where salary * nvl(commission_pct,0) < 1000;
@@ -146,6 +161,94 @@ SELECT salary, employee_id, first_name, salary * nvl(commission_pct,0) from empl
 --nvl2(표현식1, 2, 3) : 표현식이 널이면 표현식 3을 아니면 2를 반환 
 select employee_id, first_name, salary, salary + salary * commission_pct total_salary, nvl2(commission_pct, salary+(salary*commission_pct),salary)total_salary2 from employees;
 
+-- 조건함수 decode : decode(표현식, search1, result1, search2, result2...)  ------------ max35, default_result
+
+select sysdate from dual;
+
+select employee_id, first_name || ' '|| last_name 이름, decode(ROUND((sysdate - hire_date) / 365),20,'20 year',ROUND((sysdate - hire_date) / 365)) 근속년도 from employees;
+
+-- case 대상값 when 비교값 then 처리1, when 비교값 then 처리2, ... else default
+
+--distinct 중복제거
+
+select distinct department_id from employees; 
+
+select all department_id from employees;
+
+-- count(*)
+select count(*) from employees;
+
+select count(distinct employee_id), count(distinct first_name) from employees;
+
+select count(department_id), count(distinct department_id) from employees;
+
+--
+select sum(salary) from employees;
+
+select sum(distinct salary) from employees;
+
+select count(*) from employees;
+
+
+select salary, count(*), sum(salary) from employees GROUP BY salary HAVING count(*) > 1;
+
+select employee_id , first_name || last_name, salary from employees where salary = max(salary) or salary = min(salary);
+
+select ROUND(sum(salary)/count(salary)) from employees; -- avg
+select avg(salary) from employees;
+
+select department_id from employees group by department_id;
+
+select department_id, round(avg(salary),2) 평균급여 ,count(*) 사원수 from employees group by department_id, salary;
+
+select * from employees;
+
+select department_id, job_id, round(avg(salary),2) 평균급여 ,count(*) 사원수 from employees group by department_id, job_id order by department_id, job_id;
+
+--select -- from -- where -- group by -- orderby
+select max(salary) from employees;
+select department_id ,sum(salary), avg(salary) from employees where department_id = 90 group by department_id;
+
+select decode(department_id,null,'부서없음',department_id) 부서_아이디, count(*) from employees group by department_id order by department_id;
+-- where department_id is not null 
+
+select department_id , count(*) from employees where department_id is not null group by department_id having count(*) < 5 order by department_id;
+
+-- sub query 
+select first_name || last_name 이름, salary from employees where salary < (select avg(salary) from employees) ; 
+
+select * from locations where state_province is null;
+
+select * from departments dept, locations loc where dept.location_id = loc.location_id and state_province is null;
+-- 위 아래 동일한 쿼리
+select * from departments where location_id in(select location_id from locations where state_province is null); 
+
+select * from jobs;
+select * from employees, jobs where salary = (select max(salary) from employees) and employees.job_id = jobs.job_id ;
+
+select * from locations;
+select * from departments;
+select * from employees;
+
+select first_name || last_name 이름, salary from employees emp, departments dept where 
+    salary > (select avg(salary) from employees) and emp.department_id = dept.department_id 
+    and dept.location_id in(select location_id from locations where country_id = 'US');
+
+select salary from employees where department_id = 30;
+
+--any , all
+select salary from employees where department_id = 30;
+select employee_id, first_name || last_name 이름, salary from employees where salary > any(select salary from employees where department_id = 30); -- 만족 값이 하나 이상
+select employee_id, first_name || last_name 이름, salary from employees where salary > all(select salary from employees where department_id = 30); -- 전부 만족
+
+select first_name || last_name 이름, salary from employees 
+    where salary > (select avg(salary) from employees) and salary < (select max(salary) from employees)
+order by salary;
+
+select * from employees a, (select avg(salary) avgs, max(salary) maxs from employees) b where a.salary between b.avgs and b.maxs order by salary;
+
+--
+select * from (select * from employees order by salary desc) where rownum < 11;
 
 
 
